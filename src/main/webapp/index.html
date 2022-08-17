@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="sr">
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>
+
+        <script src="/home.js"></script>
+        <script src="/omiljene.js"></script>
+        <script src="/onama.js"></script>
+        <script src="/knjige.js"></script>
+        <script src="/login.js"></script>
+        <script src="/registracija.js"></script>
+        <script src="/logout.js"></script>
+        <script src="/detaljnije.js"></script>
+        <script src="/pretraga.js"></script>
+        <script src="/admin.js"></script>
+        <script src="/dodaj.js"></script>
+        <script src="/profil.js"></script>
+
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Projekat</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <link rel="stylesheet" href="/style.css">
+
+    </head>
+
+<body>
+
+<div id="app">
+
+<!--header pocetak-->
+
+    <header class="header">
+
+       <div class="header-1">
+          <div id="logo">
+            <img src="/img/gblogo.png" height="50" width="50"  alt="Logo">
+          </div>
+
+           <div class="search-form">
+               <input  v-model="pretragaPolje"  type="search" name="search-box" placeholder="Pretraga knjiga po imenu.." id="search-box">
+               <div @click="pretF()" id="search-btn" class="right"><i class="fas fa-search"></i></div>
+           </div>
+         
+        <div class="icons">
+
+            <router-link class="right" v-if=logged :to="'/omiljene'" ><i class="fas fa-heart"></i></router-link>
+            <router-link  class="right" :to="'/login'" v-if=!logged><i class="fas fa-user"></i></router-link>
+            <router-link  class="right" :to="'/registracija'" v-if=!logged><i class="fas fa-user-plus"></i></router-link>
+            <router-link class="right" :to="'/profil'" v-if=logged><i class="fas fa-user-edit"></i></router-link>
+            <router-link  class="right" v-if=logged :to="'/logout'"><i class="fas fa-power-off"></i></router-link>
+    </div>
+	
+	</div>
+	
+       <div class="header-2">
+          <nav class="navbar">
+            <router-link :to="'/home'"><i class="fas fa-home"></i>Home</router-link>
+            <router-link :to="'/onama'">O nama</router-link>
+			<div class="dropdown">
+			<router-link class="dropbtn" :to="'/knjige'">Knjige<i class="fas fa-book"></i></router-link>
+			<div class="dropdown-content">
+                <router-link v-for="z in zanrovi" :key="z.id" :to="'/zanrovi/'+z.znr_naziv">{{ z.znr_naziv }}</router-link>
+              </div>
+            </div>
+            <router-link :to="'/admin'" v-if="adminc">Admin</router-link>
+        </nav>    
+      </div>
+	  
+</header>
+
+
+<router-view>
+
+
+</router-view>
+
+<!--newsletter section start-->
+    <section class="newsletter">
+
+        <div class="news">
+            <h3>Pretplatite se na najnovija azuriranja</h3>
+            <input type="email" name="" placeholder="Unesite email"  class="box"><br>
+            <input type="submit" value="Pretplatite se" class="btn">
+        </div>
+    </section>
+
+
+
+<!--footer pocetak-->
+<footer>
+   <div class="container">
+
+       <div class="social">
+
+       <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-linkedin"></i></a>
+
+      </div>
+
+
+
+    <div class="menu">
+
+        <a href="#"><i class="fas fa-home"></i>Home</a>
+        <a href="#">O nama</a>
+        <a href="#"><i class="fas fa-book"></i>Knjige</a>
+        <a href="#">Admin</a>
+        <a href="#"><i class="fas fa-user"></i>Login</a>
+        <a href="#"><i class="fas fa-user-lock"></i>Registracija</a>
+        <a href="#"><i class="fas fa-user-edit"></i>Profil</a>
+        <a href="#"><i class="fas fa-power-off"></i>Odjava</a>
+
+
+
+    </div>
+
+    <div class="mail">
+
+        <a href="#"><i class="fas fa-envelope"></i>gabrijelabrankovic9@gmail.com</a>
+        <a href="#"><i class="fas fa-envelope"></i>gabrijela.brankovic25@gmail.com</a>
+    </div>
+
+    <p>Created by <strong>Gabrijela Brankovic</strong> |Sva prava zadrzana!|</p>
+</div>
+</footer>
+
+
+</div>
+
+<script>
+
+    const routes= [
+     { path:'/home', component:Home },
+     { path:'/onama', component:Onama },
+     { path:'/zanrovi/:naziv', component:Knjige},
+     { path:'/login', component:Login },
+     { path:'/registracija', component:Registracija },
+     { path:'/logout', component:Logout },
+     { path:'/detaljnije/:odakle', component:Detaljnije },
+     { path:'/admin', component: Admin },
+     { path:'/dodaj', component:Dodaj },
+    { path:'/omiljene', component:Omiljene },
+    { path:'/pretraga/:naziv', component:Pretraga },
+    { path:'/profil', component:Profil },
+
+    ]
+
+    const router=new VueRouter({
+    routes,
+    mode:'history',
+    })
+
+    let app=new Vue({
+      el:'#app',
+      router,
+      data() {
+      const logged=false;
+      let pretragaPolje = "";
+      const adminc=false;
+         return{
+        zanrovi:[],
+        logged,
+    pretragaPolje,
+        adminc,
+
+    }
+    },
+    methods:{
+    getZanrovi(){
+     get("/api/zanrovi",{},(data)=>{
+        this.zanrovi=data
+    })
+},
+    pretF(){
+
+
+       // console.log(this.pretragaPolje);
+    router.push("/pretraga/" + this.pretragaPolje);
+
+    },
+    getCheckLogin() {
+    console.log(this.logged)
+    console.log(this.adminc);
+    get("/api/checkLogin",{},(data)=> {
+        if(data.res=="ok"){
+            this.logged=true;
+                if(data.adminc == 1){
+                    this.adminc=true;
+                }else{
+                 this.adminc=false;
+                }
+        }else{
+            this.logged=false;
+            this.adminc=false;
+        }
+   // router.push("/home");
+        //this.$fourceUpdate();
+})
+    },
+
+},
+
+    mounted() {
+        this.pretragaPolje = "";
+      this.getZanrovi();
+      this.getCheckLogin();
+
+    },
+    });
+
+
+    axios.defaults.baseUrl="https://localhost:8080/"
+
+    function get(from,params,callback) {
+    axios.get(from,{params:params})
+    .then(response => {
+    if(callback)
+    callback.call(app,response.data);
+    })
+    .catch(function(e) {
+    console.log(e);
+    })
+    }
+
+</script>
+
+
+</body>
+</html>
